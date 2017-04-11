@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">InAuthCodingChallenge</string>
+    <string name="txt_http">HTTP Request</string>
+    <string name="txt_gps">GPS</string>
+    <string name="txt_apps">Apps</string>
+    <string name="txt_installed_apps">\n- Installed Apps -\n</string>
+    <string name="txt_location">\n -Location Latitude:Longitude -\n</string>
+    <string name="txt_http_result">- Http Result -</string>
+    <string name="reason_internet">In order to access the JSON API internet access is needed. Grant permission to use Internet?</string>
+    <string name="OK">OK</string>
+    <string name="YES">YES</string>
+    <string name="NO">NO</string>
+</resources>
