@@ -1,15 +1,15 @@
-package com.drawingboardapps.inauthcodingchallenge.Activity;
+package com.drawingboardapps.inauthcodingchallenge.activity;
 
 import android.Manifest;
-import android.content.Context;
 
-import com.drawingboardapps.inauthcodingchallenge.Application.MainContentProvider;
-import com.drawingboardapps.inauthcodingchallenge.Interface.MainPresenter;
+import com.drawingboardapps.inauthcodingchallenge.application.MainContentProvider;
+import com.drawingboardapps.inauthcodingchallenge.interfaces.MainPresenter;
 import com.drawingboardapps.inauthcodingchallenge.R;
+import com.drawingboardapps.inauthcodingchallenge.interfaces.MainView;
 
 import static android.support.v4.content.PermissionChecker.PERMISSION_GRANTED;
-import static com.drawingboardapps.inauthcodingchallenge.Activity.BasePermissionActivity.GPS_PERMISSION;
-import static com.drawingboardapps.inauthcodingchallenge.Activity.BasePermissionActivity.INTERNET_PERMISSION;
+import static com.drawingboardapps.inauthcodingchallenge.activity.BasePermissionActivity.DISK_PERMISSION;
+import static com.drawingboardapps.inauthcodingchallenge.activity.BasePermissionActivity.GPS_PERMISSION;
 
 /**
  * Created by Zach on 4/11/2017.
@@ -27,14 +27,9 @@ public class PermissionsHelper {
         void askAgain();
     }
 
-
-    public void handlePermission(int requestCode, int[] grantResults, Callback callback) {
-
-    }
-
     private void hasPermission(int[] grantResults, Callback callback) {
         if (grantResults.length > 0
-                && grantResults[0] == PERMISSION_GRANTED){
+                && grantResults[0] == PERMISSION_GRANTED) {
             callback.granted();
             return;
         }
@@ -44,23 +39,24 @@ public class PermissionsHelper {
     private final MainView mainView;
     private final MainPresenter mainPresenter;
 
-    public PermissionsHelper(MainView mainView, MainPresenter mainPresenter){
+    public PermissionsHelper(MainView mainView, MainPresenter mainPresenter) {
         this.mainView = mainView;
         this.mainPresenter = mainPresenter;
     }
 
 
-    public PermissionsHelper.Callback getGpsPermissionCallback(final MainInteractor.OnReceivedHttpResult listener) {
+    public final PermissionsHelper.Callback
+    getGpsPermissionCallback() {
         return new PermissionsHelper.Callback() {
 
             @Override
             public void granted() {
-                mainView.getQueryParam(listener);
+                mainPresenter.getGpsLocation();
             }
 
             @Override
             public void denied() {
-                mainView.setButtonEnabled(R.id.button1, false);
+                mainView.setButtonEnabled(R.id.btn_gps, false);
             }
 
             @Override
@@ -75,28 +71,29 @@ public class PermissionsHelper {
         };
     }
 
-    private PermissionsHelper.Callback getApiPermissionCallback(final Context context, final String queryParam) {
+
+    public PermissionsHelper.Callback
+    getFileSystemPermissionCallback(){
         return new PermissionsHelper.Callback() {
             @Override
             public void granted() {
-                MainContentProvider.Http.makeRequest(mainView.getContext(),
-                        queryParam,
-                        MainPresenterImpl.this);
+                MainContentProvider.FileSystem.getInstalledApps(mainView.getContext());
             }
 
             @Override
             public void denied() {
-                mainView.setButtonEnabled(R.id.button1, false);
+                mainView.setButtonEnabled(R.id.btn_apps, false);
+                mainView.showError(mainPresenter.getString(R.string.perm_denied_usr));
             }
 
             @Override
             public int getRequestCode() {
-                return INTERNET_PERMISSION;
+                return DISK_PERMISSION;
             }
 
             @Override
             public void askAgain() {
-                onQueryParamSet(context, queryParam);
+                mainView.askPermission(Manifest.permission.READ_EXTERNAL_STORAGE, this);
             }
         };
     }

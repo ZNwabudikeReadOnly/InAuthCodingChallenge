@@ -1,12 +1,9 @@
-package com.drawingboardapps.inauthcodingchallenge.Activity;
+package com.drawingboardapps.inauthcodingchallenge.activity;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.telecom.Call;
 
 import com.drawingboardapps.inauthcodingchallenge.R;
 

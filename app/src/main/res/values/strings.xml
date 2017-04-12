@@ -10,4 +10,5 @@
     <string name="OK">OK</string>
     <string name="YES">YES</string>
     <string name="NO">NO</string>
+    <string name="perm_denied_usr">Permission Denied By User</string>
 </resources>

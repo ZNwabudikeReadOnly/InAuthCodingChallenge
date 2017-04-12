@@ -1,4 +1,4 @@
-package com.drawingboardapps.inauthcodingchallenge.Driver;
+package com.drawingboardapps.mainsdk.sdk.hidden;
 
 import android.location.Location;
 
@@ -7,7 +7,7 @@ import android.location.Location;
  */
 public class GPSDriver {
 
-
+    Location location = null;
 
     public Location getLocation() {
         return location;

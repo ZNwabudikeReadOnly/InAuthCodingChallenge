@@ -1,38 +1,42 @@
-package com.drawingboardapps.inauthcodingchallenge.Activity;
+package com.drawingboardapps.inauthcodingchallenge.activity;
 
 import android.Manifest;
-import android.app.Dialog;
 import android.content.Context;
 import android.location.Location;
 import android.support.annotation.NonNull;
 
-import com.drawingboardapps.inauthcodingchallenge.Application.MainContentProvider;
-import com.drawingboardapps.inauthcodingchallenge.Constants;
-import com.drawingboardapps.inauthcodingchallenge.Interface.MainPresenter;
-import com.drawingboardapps.inauthcodingchallenge.Models.DataTransfer;
-import com.drawingboardapps.inauthcodingchallenge.R;
+import com.drawingboardapps.inauthcodingchallenge.application.MainContentProvider;
+import com.drawingboardapps.inauthcodingchallenge.interfaces.MainPresenter;
+import com.drawingboardapps.inauthcodingchallenge.interfaces.MainView;
+import com.drawingboardapps.mainsdk.sdk.external.models.DataTransfer;
+import com.drawingboardapps.mainsdk.sdk.external.models.LEDData;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedList;
 
-import static com.drawingboardapps.inauthcodingchallenge.Activity.BasePermissionActivity.GPS_PERMISSION;
-import static com.drawingboardapps.inauthcodingchallenge.Activity.BasePermissionActivity.INTERNET_PERMISSION;
-import static com.drawingboardapps.inauthcodingchallenge.Constants.EventBus.GET_API;
-import static com.drawingboardapps.inauthcodingchallenge.Constants.EventBus.GET_APPS;
-import static com.drawingboardapps.inauthcodingchallenge.Constants.EventBus.GET_GPS;
-import static com.drawingboardapps.inauthcodingchallenge.Constants.EventBus.Status.OK;
+import static com.drawingboardapps.mainsdk.sdk.hidden.Constants.EventBus.GET_API;
+import static com.drawingboardapps.mainsdk.sdk.hidden.Constants.EventBus.GET_APPS;
+import static com.drawingboardapps.mainsdk.sdk.hidden.Constants.EventBus.GET_GPS;
+import static com.drawingboardapps.mainsdk.sdk.hidden.Constants.EventBus.Status.OK;
+
 
 /**
  * Created by Zach on 4/10/2017.
  */
-final class MainPresenterImpl implements MainPresenter, MainInteractor.OnReceivedHttpResult {
+public final class MainPresenterImpl implements MainPresenter {
 
     private final MainView mainView;
+    private final PermissionsHelper permissionHelper;
 
-    public MainPresenterImpl(MainView mainView) {
+    public MainPresenterImpl(@NotNull MainView mainView) {
         this.mainView = mainView;
+        this.permissionHelper = new PermissionsHelper(mainView, this);
+    }
+
+    @Override
+    public void onPause() {
+
     }
 
     @Override
@@ -45,61 +49,55 @@ final class MainPresenterImpl implements MainPresenter, MainInteractor.OnReceive
 
     }
 
+    /****
+     * Click Handlers
+     ****/
     @Override
     public void onHttpClicked(Context context) {
-        mainView.getQueryParam(MainPresenterImpl.this);
+        mainView.getQueryParam();
     }
 
     @Override
-    public void onReceivedInstalledApps(@NonNull LinkedList<String> installedApps) {
-        mainView.showInstalledApps(installedApps);
+    public void onFilesClicked(MainActivity mainActivity) {
+        mainView.askPermission(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                permissionHelper.getFileSystemPermissionCallback()
+        );
     }
 
     @Override
-    public void onQueryParamSet(final Context context, final String queryParam) {
-        mainView.askPermission(Manifest.permission.INTERNET, getApiPermissionCallback(context, queryParam));
+    public void onGPSClicked(final Context context) {
+        mainView.askPermission(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                permissionHelper.getGpsPermissionCallback()
+        );
     }
 
     /***
      * Receivers
      ***/
-    @Override
-    public void onReceivedHttpResult(Object data) {
-        if (data instanceof JSONObject) {
-            try {
-                mainView.showHttpResult(((JSONObject) data).toString(1));
-            } catch (JSONException e) {
-                mainView.showError("JSONException: Bad JSON Formatting");
-            }
-        }
-
-    }
 
     @Override
-    public void onReceivedGpsResult(Location data) {
-        mainView.showLocation(data);
-    }
-
-    @Override
-    public void onReceivedAppsResult(LinkedList<String> data) {
-
-    }
-
-    @Override
-    public void onGPSClicked(final Context context) {
-        mainView.askPermission(Manifest.permission.ACCESS_FINE_LOCATION, gpsPermissionCallback);
-    }
-
-    @Override
+    @SuppressWarnings("unchecked")
     public void onDataTransfer(DataTransfer event) {
         //error handled in super
-        if (checkError(event)) {
+        if (event == null) {
+            mainView.showError("Data Transfer Event null");
+            return;
+        }
+        if (event.getStatus() != OK) {
+            mainView.showError("Error: " + event.getMsg());
+            return;
+        }
+
+        if (event.getData() == null) {
+            mainView.showError("Error, Data null");
             return;
         }
 
         switch (event.getMsg()) {
             case GET_API:
-                onReceivedHttpResult(event.getData());
+                onReceivedApiResponse(event);
                 break;
             case GET_GPS:
                 if (event.getData() instanceof Location) {
@@ -115,79 +113,51 @@ final class MainPresenterImpl implements MainPresenter, MainInteractor.OnReceive
         }
     }
 
-    public class PermissionsHelper2{
-        private final MainView mainView;
-        private final MainPresenter mainPresenter;
-
-        public PermissionsHelper2(MainView mainView, MainPresenter mainPresenter){
-            this.mainView = mainView;
-            this.mainPresenter = mainPresenter;
-        }
-
-        private PermissionsHelper.Callback gpsPermissionCallback = new PermissionsHelper.Callback() {
-
-            @Override
-            public void granted() {
-                mainView.getQueryParam(MainPresenterImpl.this);
-            }
-
-            @Override
-            public void denied() {
-                mainView.setButtonEnabled(R.id.button1, false);
-            }
-
-            @Override
-            public int getRequestCode() {
-                return GPS_PERMISSION;
-            }
-
-            @Override
-            public void askAgain() {
-                mainView.askPermission(Manifest.permission.ACCESS_FINE_LOCATION, this);
-            }
-        };
-
-        private PermissionsHelper.Callback getApiPermissionCallback(final Context context, final String queryParam) {
-            return new PermissionsHelper.Callback() {
-                @Override
-                public void granted() {
-                    MainContentProvider.Http.makeRequest(mainView.getContext(),
-                            queryParam,
-                            MainPresenterImpl.this);
-                }
-
-                @Override
-                public void denied() {
-                    mainView.setButtonEnabled(R.id.button1, false);
-                }
-
-                @Override
-                public int getRequestCode() {
-                    return INTERNET_PERMISSION;
-                }
-
-                @Override
-                public void askAgain() {
-                    onQueryParamSet(context, queryParam);
-                }
-            };
-        }
+    @Override
+    public void onReceivedInstalledApps(@NonNull LinkedList<String> installedApps) {
+        mainView.showInstalledApps(installedApps);
     }
 
-    boolean checkError(DataTransfer event) {
-        if (event == null) {
-            mainView.showToastError("Data Transfer Event null");
-            return true;
+    @Override
+    public void onReceivedApiResponse(DataTransfer event) {
+        if (event.getData() instanceof LEDData) {
+            mainView.showHttpResult(((LEDData) event.getData()).toString());
+            return;
         }
-        if (event.getStatus() != OK) {
-            mainView.showToastError("Error: " + event.getMsg());
-            return true;
-        }
-
-        if (event.getData() == null) {
-            mainView.showToastError("Error, Data null");
-            return true;
-        }
-        return false;
+        mainView.showError("Unexpected Response Object");
     }
+
+    @Override
+    public void onReceivedGpsResult(Location data) {
+        mainView.showLocation(data);
+    }
+
+    @Override
+    public void onReceivedAppsResult(LinkedList<String> data) {
+        mainView.showInstalledApps(data);
+    }
+
+    @Override
+    public void onQueryParamSet(final Context context, final String queryParam) {
+        MainContentProvider.Http.makeRequest(
+                mainView.getContext(),
+                queryParam
+        );
+    }
+
+    @Override
+    public void getInstalledAppList() {
+        MainContentProvider.FileSystem.getInstalledApps(mainView.getContext());
+    }
+
+    @Override
+    public void getGpsLocation() {
+        MainContentProvider.GPS.getLocation(mainView.getContext());
+    }
+
+    @Override
+    public String getString(int resId) {
+        return mainView.getContext().getString(resId);
+    }
+
 }

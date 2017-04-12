@@ -1,9 +1,12 @@
-package com.drawingboardapps.inauthcodingchallenge.Application;
+package com.drawingboardapps.inauthcodingchallenge.application;
 
 import android.app.Application;
 
-import com.drawingboardapps.inauthcodingchallenge.Driver.GPSDriver;
-import com.drawingboardapps.inauthcodingchallenge.Driver.HttpAPI;
+import com.drawingboardapps.mainsdk.sdk.hidden.FileSystemDriver;
+import com.drawingboardapps.mainsdk.sdk.hidden.GPSDriver;
+import com.drawingboardapps.mainsdk.sdk.hidden.HttpAPIDriver;
+
+import org.greenrobot.eventbus.EventBus;
 
 /**
  * Created by Zach on 4/10/2017.
@@ -11,27 +14,34 @@ import com.drawingboardapps.inauthcodingchallenge.Driver.HttpAPI;
 
 public class MainApplication extends Application{
 
-    private static HttpAPI httpDriver;
+    private static HttpAPIDriver httpDriver;
+    private static GPSDriver gpsDriver;
+    private static FileSystemDriver fsDriver;
 
     @Override
     public void onCreate(){
         setupHttpDriver();
         setupGPSDriver();
+        setupFileSystemDriver();
     }
 
-    private void setupHttpDriver() {
+    private void setupFileSystemDriver() {fsDriver = new FileSystemDriver();}
 
+    private void setupHttpDriver() {
+        httpDriver = new HttpAPIDriver(EventBus.getDefault());
     }
 
     private void setupGPSDriver(){
-        this.gpsDriver = new GPSDriver();
+        gpsDriver = new GPSDriver();
     }
 
-    public HttpAPI getHttpDriver() {
+    public HttpAPIDriver getHttpDriver() {
         return httpDriver;
     }
 
     public GPSDriver getGPSDriver() {
-        return GPSDriver;
+        return gpsDriver;
     }
+
+    public FileSystemDriver getGetFileSystemDriver() {return fsDriver;}
 }
