@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/InAuthCodingChallenge.iml" filepath="$PROJECT_DIR$/InAuthCodingChallenge.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/mainsdk/mainsdk.iml" filepath="$PROJECT_DIR$/mainsdk/mainsdk.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mainsdk/mainsdk.iml" filepath="$PROJECT_DIR$/mainsdk/mainsdk.iml" />
     </modules>
   </component>
 </project>

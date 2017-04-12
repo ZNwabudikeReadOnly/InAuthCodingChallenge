@@ -11,8 +11,6 @@ import com.drawingboardapps.inauthcodingchallenge.interfaces.MainView;
 import com.drawingboardapps.mainsdk.sdk.external.models.DataTransfer;
 import com.drawingboardapps.mainsdk.sdk.external.models.LEDData;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.LinkedList;
 
 import static com.drawingboardapps.mainsdk.sdk.hidden.Constants.EventBus.GET_API;
@@ -29,7 +27,7 @@ public final class MainPresenterImpl implements MainPresenter {
     private final MainView mainView;
     private final PermissionsHelper permissionHelper;
 
-    public MainPresenterImpl(@NotNull MainView mainView) {
+    public MainPresenterImpl(@NonNull MainView mainView) {
         this.mainView = mainView;
         this.permissionHelper = new PermissionsHelper(mainView, this);
     }

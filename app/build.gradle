@@ -24,6 +24,7 @@ android {
 }
 ext{
     butterknifeVersion='8.5.1'
+
 }
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -43,5 +44,6 @@ dependencies {
     //Retrofit
     compile 'com.squareup.retrofit2:retrofit:2.2.0'
     compile 'com.squareup.retrofit2:converter-gson:2.2.0'
+
     compile project(path: ':mainsdk')
 }

@@ -4,10 +4,10 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.support.annotation.NonNull;
 
 import com.drawingboardapps.inauthcodingchallenge.R;
 
-import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 
@@ -26,8 +26,8 @@ public abstract class BasePermissionActivity extends BaseActivity {
 
     @Override
     public abstract void onRequestPermissionsResult(int requestCode,
-                                                    @NotNull String permissions[],
-                                                    @NotNull int[] grantResults);
+                                                    @NonNull String permissions[],
+                                                    @NonNull int[] grantResults);
 
     boolean hasPermission(int[] grantResults) {
         return grantResults.length > 0

@@ -5,6 +5,7 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.widget.Button;
@@ -16,7 +17,6 @@ import com.drawingboardapps.mainsdk.sdk.external.models.DataTransfer;
 import com.drawingboardapps.mainsdk.sdk.hidden.Constants;
 
 import org.greenrobot.eventbus.Subscribe;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedList;
 
@@ -41,6 +41,7 @@ public class MainActivity extends BasePermissionActivity implements MainView {
 
     private MainPresenterImpl presenter;
 
+
     @Override
     final protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,25 +49,6 @@ public class MainActivity extends BasePermissionActivity implements MainView {
         ButterKnife.bind(this);
         this.presenter = new MainPresenterImpl(this);
         super.setPresenter(presenter);
-    }
-
-    /*******************
-     * Click Listeners *
-     *******************/
-    @OnClick(R.id.button1)
-    public void onHttpClicked() {
-        presenter.onHttpClicked(this);
-    }
-
-    @OnClick(R.id.btn_gps)
-    public void onGpsClicked() {
-        presenter.onGPSClicked(this);
-    }
-
-    @OnClick(R.id.btn_apps)
-    public void onAppsClicked() {
-        presenter.onFilesClicked(this);
-//        presenter.onReceivedInstalledApps(installedApps);
     }
 
     /*****************************************************************
@@ -122,8 +104,8 @@ public class MainActivity extends BasePermissionActivity implements MainView {
 
     @Override
     public void onRequestPermissionsResult(int requestCode,
-                                           @NotNull String permissions[],
-                                           @NotNull int[] grantResults) {
+                                           @NonNull String permissions[],
+                                           @NonNull int[] grantResults) {
 
         switch (requestCode) {
             case INTERNET_PERMISSION:
@@ -143,6 +125,26 @@ public class MainActivity extends BasePermissionActivity implements MainView {
     }
 
     /***** End Objectives ****/
+
+
+    /*******************
+     * Click Listeners *
+     *******************/
+    @OnClick(R.id.button1)
+    public void onHttpClicked() {
+        presenter.onHttpClicked(this);
+    }
+
+    @OnClick(R.id.btn_gps)
+    public void onGpsClicked() {
+        presenter.onGPSClicked(this);
+    }
+
+    @OnClick(R.id.btn_apps)
+    public void onAppsClicked() {
+        presenter.onFilesClicked(this);
+//        presenter.onReceivedInstalledApps(installedApps);
+    }
 
     /*****
      * View Methods
